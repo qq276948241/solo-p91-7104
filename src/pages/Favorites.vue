@@ -1,17 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { X, Heart } from 'lucide-vue-next'
-import { useItems } from '@/composables/useItems'
-import { CATEGORY_LABELS } from '@/types'
-import type { Item } from '@/types'
+import { Heart } from 'lucide-vue-next'
+import ItemCard from '@/components/ItemCard.vue'
+import { useFavorites } from '@/composables/useFavorites'
 
 const router = useRouter()
-const { items, favorites, toggleFavorite } = useItems()
-
-const favoriteItems = computed(() =>
-  items.value.filter((i) => favorites.value.includes(i.id)),
-)
+const { favoriteItems, removeFavorite } = useFavorites()
 
 const columnLeft = computed(() =>
   favoriteItems.value.filter((_, i) => i % 2 === 0),
@@ -20,14 +15,9 @@ const columnRight = computed(() =>
   favoriteItems.value.filter((_, i) => i % 2 === 1),
 )
 
-const goDetail = (id: string) => {
-  router.push(`/detail/${id}`)
-}
-
-const onRemoveClick = (e: Event, item: Item) => {
-  e.stopPropagation()
-  if (confirm(`确定取消收藏「${item.title}」吗？`)) {
-    toggleFavorite(item.id)
+const onRemove = (id: string, title: string) => {
+  if (confirm(`确定取消收藏「${title}」吗？`)) {
+    removeFavorite(id)
   }
 }
 </script>
@@ -47,84 +37,22 @@ const onRemoveClick = (e: Event, item: Item) => {
 
     <div v-else class="flex gap-3">
       <div class="flex-1 flex flex-col gap-3">
-        <div
+        <ItemCard
           v-for="item in columnLeft"
           :key="item.id"
-          class="card cursor-pointer relative"
-          @click="goDetail(item.id)"
-        >
-          <div class="relative">
-            <img
-              :src="item.images[0]"
-              :alt="item.title"
-              class="w-full h-auto object-cover bg-gray-100"
-              loading="lazy"
-            />
-            <button
-              class="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-sm transition-transform active:scale-90 hover:bg-red-50"
-              :title="'取消收藏'"
-              @click="onRemoveClick($event, item)"
-            >
-              <X :size="14" class="text-gray-600" />
-            </button>
-            <span
-              class="absolute bottom-2 left-2 text-[11px] font-medium bg-primary/90 text-white px-2 py-0.5 rounded-full"
-            >
-              {{ CATEGORY_LABELS[item.category] }}
-            </span>
-          </div>
-          <div class="p-3">
-            <h3 class="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mb-2">
-              {{ item.title }}
-            </h3>
-            <div class="flex items-center gap-1.5 text-xs text-gray-500">
-              <span class="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-medium text-gray-600 overflow-hidden">
-                {{ item.contactName.charAt(0) }}
-              </span>
-              <span class="truncate max-w-[100px]">{{ item.contactName }}</span>
-            </div>
-          </div>
-        </div>
+          :item="item"
+          removable
+          @remove="onRemove(item.id, item.title)"
+        />
       </div>
       <div class="flex-1 flex flex-col gap-3">
-        <div
+        <ItemCard
           v-for="item in columnRight"
           :key="item.id"
-          class="card cursor-pointer relative"
-          @click="goDetail(item.id)"
-        >
-          <div class="relative">
-            <img
-              :src="item.images[0]"
-              :alt="item.title"
-              class="w-full h-auto object-cover bg-gray-100"
-              loading="lazy"
-            />
-            <button
-              class="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-sm transition-transform active:scale-90 hover:bg-red-50"
-              :title="'取消收藏'"
-              @click="onRemoveClick($event, item)"
-            >
-              <X :size="14" class="text-gray-600" />
-            </button>
-            <span
-              class="absolute bottom-2 left-2 text-[11px] font-medium bg-primary/90 text-white px-2 py-0.5 rounded-full"
-            >
-              {{ CATEGORY_LABELS[item.category] }}
-            </span>
-          </div>
-          <div class="p-3">
-            <h3 class="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug mb-2">
-              {{ item.title }}
-            </h3>
-            <div class="flex items-center gap-1.5 text-xs text-gray-500">
-              <span class="w-5 h-5 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-medium text-gray-600 overflow-hidden">
-                {{ item.contactName.charAt(0) }}
-              </span>
-              <span class="truncate max-w-[100px]">{{ item.contactName }}</span>
-            </div>
-          </div>
-        </div>
+          :item="item"
+          removable
+          @remove="onRemove(item.id, item.title)"
+        />
       </div>
     </div>
   </div>

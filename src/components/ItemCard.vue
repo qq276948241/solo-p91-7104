@@ -1,17 +1,25 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { Heart } from 'lucide-vue-next'
+import { Heart, X } from 'lucide-vue-next'
 import type { Item } from '@/types'
-import { useItems } from '@/composables/useItems'
+import { useFavorites } from '@/composables/useFavorites'
 import { CATEGORY_LABELS } from '@/types'
 
 interface Props {
   item: Item
+  removable?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  removable: false,
+})
+
+const emit = defineEmits<{
+  (e: 'remove'): void
+}>()
+
 const router = useRouter()
-const { isFavorite, toggleFavorite } = useItems()
+const { isFavorited, toggleFavorite } = useFavorites()
 
 const goDetail = () => {
   router.push(`/detail/${props.item.id}`)
@@ -20,6 +28,11 @@ const goDetail = () => {
 const onFavClick = (e: Event) => {
   e.stopPropagation()
   toggleFavorite(props.item.id)
+}
+
+const onRemoveClick = (e: Event) => {
+  e.stopPropagation()
+  emit('remove')
 }
 </script>
 
@@ -33,13 +46,21 @@ const onFavClick = (e: Event) => {
         loading="lazy"
       />
       <button
+        v-if="removable"
+        class="absolute top-2 right-2 w-7 h-7 rounded-full bg-white/90 backdrop-blur flex items-center justify-center shadow-sm transition-transform active:scale-90 hover:bg-red-50"
+        @click="onRemoveClick"
+      >
+        <X :size="14" class="text-gray-600" />
+      </button>
+      <button
+        v-else
         class="absolute top-2 right-2 w-8 h-8 rounded-full bg-white/85 backdrop-blur flex items-center justify-center shadow-sm transition-transform active:scale-90"
         @click="onFavClick"
       >
         <Heart
           :size="16"
-          :fill="isFavorite(item.id) ? '#FF8C42' : 'none'"
-          :stroke="isFavorite(item.id) ? '#FF8C42' : '#666'"
+          :fill="isFavorited(item.id) ? '#FF8C42' : 'none'"
+          :stroke="isFavorited(item.id) ? '#FF8C42' : '#666'"
           :stroke-width="2"
         />
       </button>

@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowLeft, Heart, MessageCircle, Copy, Check } from 'lucide-vue-next'
-import { ref } from 'vue'
 import ImageCarousel from '@/components/ImageCarousel.vue'
 import { useItems } from '@/composables/useItems'
+import { useFavorites } from '@/composables/useFavorites'
 import { CATEGORY_LABELS } from '@/types'
 
 const route = useRoute()
 const router = useRouter()
-const { getItemById, isFavorite, toggleFavorite } = useItems()
+const { getItemById } = useItems()
+const { isFavorited, toggleFavorite } = useFavorites()
 
 const itemId = computed(() => String(route.params.id))
 const item = computed(() => getItemById(itemId.value))
@@ -44,12 +45,12 @@ const goBack = () => {
         <h2 class="font-semibold text-gray-800">物品详情</h2>
         <button
           class="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center transition"
-          :class="isFavorite(item.id) ? 'text-primary' : 'text-gray-700 hover:bg-gray-50'"
+          :class="isFavorited(item.id) ? 'text-primary' : 'text-gray-700 hover:bg-gray-50'"
           @click="toggleFavorite(item.id)"
         >
           <Heart
             :size="20"
-            :fill="isFavorite(item.id) ? '#FF8C42' : 'none'"
+            :fill="isFavorited(item.id) ? '#FF8C42' : 'none'"
             :stroke-width="2"
           />
         </button>

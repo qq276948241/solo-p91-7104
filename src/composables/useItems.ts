@@ -1,11 +1,11 @@
 import { computed } from 'vue'
 import { useLocalStorage } from './useStorage'
+import { useFavorites } from './useFavorites'
 import type { Item, User } from '@/types'
 
 const USER_ID = 'local-user-001'
 
 const items = useLocalStorage<Item[]>('swap_items', [])
-const favorites = useLocalStorage<string[]>('swap_favorites', [])
 const user = useLocalStorage<User>('swap_user', {
   id: USER_ID,
   nickname: '邻居小王',
@@ -19,17 +19,6 @@ export function useItems() {
   )
 
   const getItemById = (id: string) => items.value.find((i) => i.id === id)
-
-  const isFavorite = (id: string) => favorites.value.includes(id)
-
-  const toggleFavorite = (id: string) => {
-    const idx = favorites.value.indexOf(id)
-    if (idx >= 0) {
-      favorites.value.splice(idx, 1)
-    } else {
-      favorites.value.push(id)
-    }
-  }
 
   const addItem = (payload: Omit<Item, 'id' | 'ownerId' | 'createdAt'>) => {
     const newItem: Item = {
@@ -45,8 +34,8 @@ export function useItems() {
   const deleteItem = (id: string) => {
     const idx = items.value.findIndex((i) => i.id === id)
     if (idx >= 0) items.value.splice(idx, 1)
-    const favIdx = favorites.value.indexOf(id)
-    if (favIdx >= 0) favorites.value.splice(favIdx, 1)
+    const { removeFavorite } = useFavorites()
+    removeFavorite(id)
   }
 
   const currentUser = user
@@ -54,11 +43,8 @@ export function useItems() {
   return {
     items: allItems,
     myItems,
-    favorites,
     currentUser,
     getItemById,
-    isFavorite,
-    toggleFavorite,
     addItem,
     deleteItem,
   }

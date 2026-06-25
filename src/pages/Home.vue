@@ -1,44 +1,17 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
 import { Search, X } from 'lucide-vue-next'
 import CategoryFilter from '@/components/CategoryFilter.vue'
 import ItemCard from '@/components/ItemCard.vue'
-import { useItems } from '@/composables/useItems'
-import type { ItemCategory } from '@/types'
+import { useSearch } from '@/composables/useSearch'
 
-const { items } = useItems()
-const category = ref<ItemCategory | 'all'>('all')
-const keyword = ref('')
-
-const clearKeyword = () => {
-  keyword.value = ''
-}
-
-const filteredItems = computed(() => {
-  let list = items.value
-
-  if (category.value !== 'all') {
-    list = list.filter((i) => i.category === category.value)
-  }
-
-  const kw = keyword.value.trim().toLowerCase()
-  if (kw) {
-    list = list.filter(
-      (i) =>
-        i.title.toLowerCase().includes(kw) ||
-        i.description.toLowerCase().includes(kw),
-    )
-  }
-
-  return list
-})
-
-const columnLeft = computed(() =>
-  filteredItems.value.filter((_, i) => i % 2 === 0),
-)
-const columnRight = computed(() =>
-  filteredItems.value.filter((_, i) => i % 2 === 1),
-)
+const {
+  keyword,
+  category,
+  filteredItems,
+  columnLeft,
+  columnRight,
+  clearKeyword,
+} = useSearch()
 </script>
 
 <template>
@@ -63,7 +36,6 @@ const columnRight = computed(() =>
         <button
           v-if="keyword"
           class="absolute right-2.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-300 transition-colors"
-          :title="'清空'"
           @click="clearKeyword"
         >
           <X :size="14" />
