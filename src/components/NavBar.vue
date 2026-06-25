@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Home, Package, PlusCircle } from 'lucide-vue-next'
+import { Home, Package, Heart, PlusCircle } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
 import { computed } from 'vue'
 
@@ -8,6 +8,7 @@ const router = useRouter()
 
 const tabs = [
   { name: 'home', label: '首页', path: '/', icon: Home },
+  { name: 'favorites', label: '我的收藏', path: '/favorites', icon: Heart },
   { name: 'my-posts', label: '我的发布', path: '/my-posts', icon: Package },
   { name: 'create', label: '发布', path: '/create', icon: PlusCircle },
 ]
@@ -27,7 +28,7 @@ const go = (path: string) => {
       <button
         v-for="tab in tabs"
         :key="tab.name"
-        class="flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all duration-200"
+        class="flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all duration-200 relative"
         :class="
           activeName === tab.name
             ? 'text-primary'

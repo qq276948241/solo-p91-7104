@@ -3,11 +3,13 @@ import Home from '@/pages/Home.vue'
 import Detail from '@/pages/Detail.vue'
 import MyPosts from '@/pages/MyPosts.vue'
 import CreatePost from '@/pages/CreatePost.vue'
+import Favorites from '@/pages/Favorites.vue'
 
 const routes: RouteRecordRaw[] = [
   { path: '/', name: 'home', component: Home },
   { path: '/detail/:id', name: 'detail', component: Detail, props: true },
   { path: '/my-posts', name: 'my-posts', component: MyPosts },
+  { path: '/favorites', name: 'favorites', component: Favorites },
   { path: '/create', name: 'create', component: CreatePost },
   { path: '/:pathMatch(.*)*', redirect: '/' },
 ]
